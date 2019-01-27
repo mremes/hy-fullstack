@@ -66,8 +66,8 @@ const App = () => {
 
     const feedbacks = [
         { name: "hyvä", score: goodVal, handler: () => setGood(goodVal + 1) },
-        { name: "neutraali", score: neutralVal, handler: setNeutral(neutralVal + 1) },
-        { name: "huono", score: badVal, handler: setBad(badVal + 1) }
+        { name: "neutraali", score: neutralVal, handler: () => setNeutral(neutralVal + 1) },
+        { name: "huono", score: badVal, handler: () => setBad(badVal + 1) }
     ];
 
     const [good, neutral, bad] = feedbacks;
