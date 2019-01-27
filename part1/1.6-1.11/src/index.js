@@ -7,73 +7,75 @@ const Button = ({ handler, text }) => {
 };
 
 const Statistic = ({ name, value }) => {
-    return (<p>{name} {value}</p>)
-};
-
-const FeedbackSummaryCounts = ({ good, neutral, bad }) => {
     return (
-        <div>
-            <Statistic name={good.name} value={good.score} />
-            <Statistic name={neutral.name} value={neutral.score} />
-            <Statistic name={bad.name} value={bad.score} />
-        </div>
+        <tr>
+            <td>{name}</td>
+            <td>{value}</td>
+        </tr>
     )
 };
 
-const FeedbackSummaryStatistics = ({ good, neutral, bad }) => {
+const SummaryCounts = ({ good, neutral, bad }) => {
+    return (
+        <tbody>
+            <Statistic name={good.name} value={good.score} />
+            <Statistic name={neutral.name} value={neutral.score} />
+            <Statistic name={bad.name} value={bad.score} />
+        </tbody>
+    )
+};
+
+const SummaryStatistics = ({ good, neutral, bad }) => {
     let metricCount = good.score + neutral.score + bad.score;
     let metricAverage = (good.score * 1 + bad.score * -1) / metricCount;
     let metricPositiveRatio = good.score / metricCount;
 
     return (
-        <div>
+        <tbody>
             <Statistic name="yhteensä" value={metricCount} />
             <Statistic name="keskiarvo" value={metricAverage} />
             <Statistic name="positiivisia" value={metricPositiveRatio * 100 + " %"} />
-        </div>
+        </tbody>
     )
 };
 
-const FeedbackButtons = ({ good, neutral, bad }) => {
+const Buttons = ({ good, neutral, bad }) => {
     return (
-    <div>
-        <Button handler={good.handler} text={good.name} />
-        <Button handler={neutral.handler} text={neutral.name} />
-        <Button handler={bad.handler} text={bad.name} />
-    </div>)
+        <div>
+            <Button handler={good.handler} text={good.name} />
+            <Button handler={neutral.handler} text={neutral.name} />
+            <Button handler={bad.handler} text={bad.name} />
+        </div>)
 };
 
 const Statistics = ({ good, neutral, bad }) => {
     if (good.score > 0 || neutral.score > 0 || bad.score > 0)
         return (
-            <div>
-                <FeedbackSummaryCounts good={good} neutral={neutral} bad={bad} />
-                <FeedbackSummaryStatistics good={good} neutral={neutral} bad={bad} />
-            </div>
+            <table>
+                <SummaryCounts good={good} neutral={neutral} bad={bad} />
+                <SummaryStatistics good={good} neutral={neutral} bad={bad} />
+            </table>
         )
     return (<div>Ei yhtään palautetta annettu</div>)
 };
+
 const App = () => {
     const [goodVal, setGood] = useState(0);
     const [neutralVal, setNeutral] = useState(0);
     const [badVal, setBad] = useState(0);
 
-    const handleGoodClick = () => setGood(goodVal + 1);
-    const handleNeutralClick = () => setNeutral(neutralVal + 1);
-    const handleBadClick = () => setBad(badVal + 1);
-
     const feedbacks = [
-        { name: "hyvä", score: goodVal, handler: handleGoodClick },
-        { name: "neutraali", score: neutralVal, handler: handleNeutralClick },
-        { name: "huono", score: badVal, handler: handleBadClick}
+        { name: "hyvä", score: goodVal, handler: () => setGood(goodVal + 1) },
+        { name: "neutraali", score: neutralVal, handler: setNeutral(neutralVal + 1) },
+        { name: "huono", score: badVal, handler: setBad(badVal + 1) }
     ];
 
     const [good, neutral, bad] = feedbacks;
 
     return (
         <div>
-            <h1>anna palautetta</h1><br />
-            <FeedbackButtons good={good} neutral={neutral} bad={bad} />
+            <h1>anna palautetta</h1>
+            <Buttons good={good} neutral={neutral} bad={bad} />
             <h1>statistiikka</h1>
             <Statistics good={good} neutral={neutral} bad={bad} />
         </div>
