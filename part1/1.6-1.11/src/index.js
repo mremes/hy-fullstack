@@ -2,17 +2,17 @@ import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
 
-const Button = ({ handler, text }) => {
-    return (<button onClick={handler}>{text}</button>)
-};
+const Button = ({ handler, text }) => (<button onClick={handler}>{text}</button>);
 
-const Statistic = ({ name, value }) => {
+const Statistic = ({ name, value }) => (<tr><td>{name}</td><td>{value}</td></tr>);
+
+const Buttons = ({ good, neutral, bad }) => {
     return (
-        <tr>
-            <td>{name}</td>
-            <td>{value}</td>
-        </tr>
-    )
+        <div>
+            <Button handler={good.handler} text={good.name} />
+            <Button handler={neutral.handler} text={neutral.name} />
+            <Button handler={bad.handler} text={bad.name} />
+        </div>)
 };
 
 const SummaryCounts = ({ good, neutral, bad }) => {
@@ -27,7 +27,7 @@ const SummaryCounts = ({ good, neutral, bad }) => {
 
 const SummaryStatistics = ({ good, neutral, bad }) => {
     let metricCount = good.score + neutral.score + bad.score;
-    let metricAverage = (good.score * 1 + bad.score * -1) / metricCount;
+    let metricAverage = (good.score - bad.score) / metricCount;
     let metricPositiveRatio = good.score / metricCount;
 
     return (
@@ -37,15 +37,6 @@ const SummaryStatistics = ({ good, neutral, bad }) => {
             <Statistic name="positiivisia" value={metricPositiveRatio * 100 + " %"} />
         </tbody>
     )
-};
-
-const Buttons = ({ good, neutral, bad }) => {
-    return (
-        <div>
-            <Button handler={good.handler} text={good.name} />
-            <Button handler={neutral.handler} text={neutral.name} />
-            <Button handler={bad.handler} text={bad.name} />
-        </div>)
 };
 
 const Statistics = ({ good, neutral, bad }) => {
@@ -65,9 +56,21 @@ const App = () => {
     const [badVal, setBad] = useState(0);
 
     const feedbacks = [
-        { name: "hyvä", score: goodVal, handler: () => setGood(goodVal + 1) },
-        { name: "neutraali", score: neutralVal, handler: () => setNeutral(neutralVal + 1) },
-        { name: "huono", score: badVal, handler: () => setBad(badVal + 1) }
+        {
+            name: "hyvä",
+            score: goodVal, 
+            handler: () => setGood(goodVal + 1)
+        },
+        { 
+            name: "neutraali", 
+            score: neutralVal, 
+            handler: () => setNeutral(neutralVal + 1) 
+        },
+        { 
+            name: "huono", 
+            score: badVal, 
+            handler: () => setBad(badVal + 1) 
+        }
     ];
 
     const [good, neutral, bad] = feedbacks;

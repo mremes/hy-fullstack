@@ -17,24 +17,24 @@ const App = (props) => {
     const [votes, setVotes] = useState(Array(props.anecdotes.length).fill(0));
 
     const numAnecdotes = props.anecdotes.length;
+    const mostVotesIdx = indexWithHighestValue(votes);
 
-    let handler = () => setSelected(Math.floor(Math.random() * numAnecdotes));
-    let setVoteHandler = () => {
-        setVotes(incrementValueAtIndex(votes, selected));
+    const nextHandler = () => {
         setSelected(Math.floor(Math.random() * numAnecdotes));
-    };
+    }
 
-    let mostVotesIdx = indexWithHighestValue(votes);
+    const voteHandler = () => {
+        setVotes(incrementValueAtIndex(votes, selected));
+    }
 
     return (
         <div>
             <h2>The Anecdote of the Day</h2>
             <Anecdote text={props.anecdotes[selected]} numVotes={votes[selected]} />
-            <button onClick={handler}>next</button>
-            <button onClick={setVoteHandler}>vote</button>
+            <button onClick={nextHandler}>next</button>
+            <button onClick={() => { voteHandler(); nextHandler(); }}>vote</button>
             <h2>The Anecdote with the Most Votes</h2>
             <Anecdote text={props.anecdotes[mostVotesIdx]} numVotes={votes[mostVotesIdx]} />
-
         </div>
     )
 }

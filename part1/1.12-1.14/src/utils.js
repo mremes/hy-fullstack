@@ -5,8 +5,6 @@ export function incrementValueAtIndex(array, idx) {
 
 export function indexWithHighestValue(array) {
     let res = 0;
-    for (let i = 1; i < array.length; i++) {
-        if (array[i] > array[res]) res = i;
-    }
+    for (let i = 1; i < array.length; i++) if (array[i] > array[res]) res = i;
     return res;
 }
