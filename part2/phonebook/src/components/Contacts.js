@@ -22,8 +22,8 @@ export const AddPersonForm = ({ formHandler, name, nameHandler, phoneNum, phoneN
     </div>)
 }
 
-export const PersonListing = ({ persons }) => {
+export const PersonListing = ({ persons, deleteHandler }) => {
     return (<div>
-        {persons.map(p => <li key={p.id}>{p.name} {p.phone}</li>)}
+        {persons.map(p => <li key={p.id}>{p.name} {p.phone} <button id={p.id} onClick={deleteHandler}>poista</button></li>)}
     </div>)
 }
