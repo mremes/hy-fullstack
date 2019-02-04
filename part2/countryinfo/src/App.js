@@ -45,7 +45,7 @@ const CountryInfo = ({ country, weather, weatherHandler }) => {
 
 const CountryListing = ({ searchInput, selectHandler, weather, weatherHandler, data }) => {
   if (searchInput.length === 0) return (<div>Start searching for countries</div>)
-  let countriesToList = data.filter(p => p.name.toLowerCase().startsWith(searchInput.toLowerCase()));
+  let countriesToList = data.filter(p => p.name.toLowerCase().includes(searchInput.toLowerCase()));
   if (countriesToList.length > 10) return (<div>Too many matches, specify another filter</div>)
   if (countriesToList.length === 1) return (<div><CountryInfo country={countriesToList[0]} weather={weather} weatherHandler={weatherHandler} /></div>)
   return countriesToList.map(c => (<div key={c.alpha2Code}>
