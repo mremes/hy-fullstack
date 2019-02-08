@@ -2,6 +2,7 @@
   "name": "2.6-2.10",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "axios": "^0.18.0",
     "react": "^16.8.0-alpha.0",
