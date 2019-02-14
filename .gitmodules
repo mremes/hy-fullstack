@@ -1,0 +1,4 @@
+[submodule "part3"]
+	path = part3
+	url = https://github.com/mremes/hy-fullstack-phonebook-backend.git
+	branch = master
