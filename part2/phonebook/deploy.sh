@@ -2,7 +2,7 @@
 set -ex
 npm run build
 
-dir="../../../fullstackopen_part3/build"
+dir="../../../hy-fullstack-phonebook-backend/build"
 rm -rf $dir
 cp -r build $dir
 rm -rf build

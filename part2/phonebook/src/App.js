@@ -32,7 +32,7 @@ const App = () => {
 
   const handlePersonUpdates = (serviceFn, oldPersons, newPerson) => {
     serviceFn(newPerson).then(p => {
-      setPersons(oldPersons.concat(newPerson).sort((a, b) => a.id - b.id))
+      setPersons(oldPersons.concat(p).sort((a, b) => a.id - b.id))
       setNewName('')
       setNewPhoneNum('')
       setSuccessMessage(`Lisättiin ${newPerson.name}`)
