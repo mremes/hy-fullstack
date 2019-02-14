@@ -8,9 +8,11 @@ const mongoose = require('mongoose')
 
 mongoose.connect(config.DB_URI, { useNewUrlParser: true })
   .then(() => {
+    // eslint-disable-next-line no-console
     console.log('connected to MongoDB')
   })
   .catch((error) => {
+    // eslint-disable-next-line no-console
     console.log('error connection to MongoDB:', error.message)
   })
 

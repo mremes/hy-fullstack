@@ -1,8 +1,10 @@
 const requestLogger = (request, response, next) => {
+  /* eslint-disable */
   console.log('Method:', request.method)
   console.log('Path:  ', request.path)
   console.log('Body:  ', request.body)
   console.log('---')
+  /* eslint-enable */
   next()
 }
 
@@ -11,6 +13,7 @@ const unknownEndpoint = (request, response) => {
 }
 
 const errorHandler = (error, request, response, next) => {
+  // eslint-disable-next-line no-console
   console.error(error.message)
 
   if (error.name === 'CastError' && error.kind === 'ObjectId') {

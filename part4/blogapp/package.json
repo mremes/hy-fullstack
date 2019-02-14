@@ -14,12 +14,16 @@
   "devDependencies": {
     "dotenv": "^6.2.0",
     "eslint": "^5.13.0",
+    "jest": "^24.1.0",
     "nodemon": "^1.18.10"
   },
   "scripts": {
-    "test": "echo \"ERROR: no tests configured\" && exit 1",
+    "test": "jest --verbose",
     "start": "node index.js",
     "watch": "nodemon index.js",
     "lint": "eslint ."
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
