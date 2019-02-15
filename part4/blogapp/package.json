@@ -16,12 +16,13 @@
     "dotenv": "^6.2.0",
     "eslint": "^5.13.0",
     "jest": "^24.1.0",
-    "nodemon": "^1.18.10"
+    "nodemon": "^1.18.10",
+    "supertest": "^3.4.2"
   },
   "scripts": {
-    "test": "jest --verbose",
-    "start": "node index.js",
-    "watch": "nodemon index.js",
+    "test": "NODE_ENV=test jest --verbose",
+    "start": "NODE_ENV=production node index.js",
+    "watch": "NODE_ENV=development nodemon index.js",
     "lint": "eslint ."
   },
   "jest": {

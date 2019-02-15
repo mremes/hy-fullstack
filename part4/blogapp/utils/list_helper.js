@@ -1,5 +1,6 @@
 const _ = require('lodash')
 
+// eslint-disable-next-line
 const dummy = (blogs) => 1
 
 const totalLikes = (blogs) => blogs.reduce((acc, e) => acc + e.likes, 0)
