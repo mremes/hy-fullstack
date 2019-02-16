@@ -1,5 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hdHRpcmVtZXMxIiwiaWQiOiI1YzY3MWNiN2U4M2MzYjdlOTg3ZTU1OTkiLCJpYXQiOjE1NTAyNjE0MzZ9.8pJcWHRvOyq4AU0TBAl54VH3ml54Vl7iFl9BE7OzAgs
 
   {
     "title": "TDD harms architecture",

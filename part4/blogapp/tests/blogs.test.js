@@ -1,59 +1,56 @@
 const supertest = require('supertest')
 const mongoose = require('mongoose')
-
+const wrapper = require('../utils/wrapper')
 const app = require('../app')
 
 const { documentToPost, manyEntries } = require('./helpers')
 const Blog = require('../models/blog')
-
-const api = supertest(app)
+const User = require('../models/user')
 
 beforeEach(async () => {
-  await Blog.deleteMany({})
-  const promises = manyEntries.map(e => new Blog(e)).map(e => e.save())
+  let user = new User({ name: 'testi', username: 'testi', password: 'testi' })
+  user = await user.save()
+  await Blog.remove({})
+  const promises = manyEntries.map(e => new Blog({ ...e, user: user.__id })).map(e => e.save())
   await Promise.all(promises)
 })
 
-const rootEndpoint = '/api/blogs'
-const GET_blogs = () => api.get(rootEndpoint)
-const POST_blogs = (doc) => api.post(rootEndpoint).send(doc)
-const DELETE_blogs = (id) => api.delete(`${rootEndpoint}/${id}`)
-const PUT_blogs = (doc) => api.put(`${rootEndpoint}`).send(doc)
+const api = wrapper(supertest(app), '/api/blogs')
 
-describe(`GET ${rootEndpoint}`, async () => {
+describe(`GET ${api.rootEndpoint}`, async () => {
   test('collection of blogs is returned as json', async () => {
-    await GET_blogs()
+    await api.get()
       .expect(200)
       .expect('Content-Type', /application\/json/)
   })
 
   test('correct number of blog entries is returned', async () => {
-    const response = await GET_blogs()
+    const response = await api.get()
     expect(response.status).toBe(200)
     expect(response.body.length).toBe(4)
   })
 
   test('each entry has "id" key within document', async () => {
-    const response = await GET_blogs()
+    const response = await api.get()
     response.body.map(e => expect(e.id).toBeDefined())
   })
 })
 
-describe(`POST ${rootEndpoint}`, async () => {
+describe(`POST ${api.rootEndpoint}`, async () => {
   test('post increases count by one', async () => {
-    let response = await GET_blogs()
+    let response = await api.get()
     const responseLength = response.body.length
 
-    await POST_blogs(documentToPost).expect(201)
+    await api.post(documentToPost).expect(201)
 
-    response = await GET_blogs()
+    response = await api.get()
     expect(response.body.length).toBe(responseLength + 1)
   })
 
   test('added document is found from the colletion', async () => {
-    await POST_blogs(documentToPost)
+    await api.post(documentToPost)
 
-    let response = await GET_blogs()
+    let response = await api.get()
     expect(response.body.map(e => e.title)).toContain('TDD harms architecture')
   })
 
@@ -61,7 +58,7 @@ describe(`POST ${rootEndpoint}`, async () => {
     const document = Object.assign({}, documentToPost)
     delete document.likes
 
-    const response = await POST_blogs(document)
+    const response = await api.post(document)
 
     expect(response.body.likes).toBe(0)
   })
@@ -71,33 +68,32 @@ describe(`POST ${rootEndpoint}`, async () => {
     delete document.title
     delete document.url
 
-    await POST_blogs(document).expect(400)
+    await api.post(document).expect(400)
   })
 })
 
-describe(`DELETE ${rootEndpoint}`, async () => {
-  test('Existing document gets deleted', async () => {
+describe(`DELETE ${api.rootEndpoint}`, async () => {
+  test('existing document gets deleted', async () => {
     const targetTitle = 'React patterns'
 
-    let blogs = await GET_blogs(documentToPost)
+    let blogs = await api.get()
     expect(blogs.body.map(e => e.title)).toContain(targetTitle)
     const targetEntry = blogs.body.find(e => e.title == targetTitle)
 
-    await DELETE_blogs(targetEntry.id).expect(204)
+    await api.delete(targetEntry.id).expect(204)
 
-    blogs = await GET_blogs(documentToPost)
+    blogs = await api.get(documentToPost)
     expect(blogs.body.map(e => e.title)).not.toContain(targetTitle)
   })
 })
 
-describe(`PUT ${rootEndpoint}`, async () => {
-  test(`Existing document's fields get updated, 
-        and assert that some fields are immutable`, async () => {
+describe(`PUT ${api.rootEndpoint}`, async () => {
+  test('existing document\'s fields get updated, and assert that some fields are immutable', async () => {
     const targetTitle = 'React patterns'
     const newUrl = 'http://localhost:3000/react_blog_post'
     const newAuthor = 'I\'M IMMUTABLE'
 
-    let blogs = await GET_blogs(documentToPost)
+    let blogs = await api.get(documentToPost)
     expect(blogs.body.map(e => e.title)).toContain(targetTitle)
     const targetEntry = blogs.body.find(e => e.title == targetTitle)
 
@@ -105,9 +101,9 @@ describe(`PUT ${rootEndpoint}`, async () => {
     targetEntry.url = newUrl
     const oldAuthor = targetEntry.author
     targetEntry.author = newAuthor
-    await PUT_blogs(targetEntry).expect(200)
+    await api.put(targetEntry).expect(200)
 
-    blogs = await GET_blogs(documentToPost)
+    blogs = await api.get(documentToPost)
     const newEntry = blogs.body.find(e => e.title == targetTitle)
     expect(newEntry.likes).toBe(targetEntry.likes)
     expect(newEntry.url).toBe(newUrl)
