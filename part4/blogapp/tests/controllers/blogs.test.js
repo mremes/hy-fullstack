@@ -1,11 +1,11 @@
 const supertest = require('supertest')
 const mongoose = require('mongoose')
-const wrapper = require('../utils/wrapper')
-const app = require('../app')
+const wrapper = require('../wrapper')
+const app = require('../../app')
 
-const { documentToPost, manyEntries } = require('./helpers')
-const Blog = require('../models/blog')
-const User = require('../models/user')
+const { documentToPost, manyEntries } = require('../helpers')
+const Blog = require('../../models/blog')
+const User = require('../../models/user')
 
 beforeEach(async () => {
   let user = new User({ name: 'testi', username: 'testi', password: 'testi' })

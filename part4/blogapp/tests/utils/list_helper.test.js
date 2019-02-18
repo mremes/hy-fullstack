@@ -1,5 +1,5 @@
-const listHelper = require('../utils/list_helper')
-const { with1Entry, with0Likes, manyEntries, empty } = require('./helpers')
+const listHelper = require('../../utils/list_helper')
+const { with1Entry, with0Likes, manyEntries, empty } = require('../helpers')
 
 describe('dummy tests', () => {
   test('dummy returns one', () => {

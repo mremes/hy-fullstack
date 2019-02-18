@@ -6,13 +6,13 @@ const dummy = (blogs) => 1
 const totalLikes = (blogs) => blogs.reduce((acc, e) => acc + e.likes, 0)
 
 const favoriteBlog = (blogs) => {
-  if (blogs.length == 0)
+  if (!blogs || blogs.length == 0)
     return undefined
   return blogs.reduce((acc, e) => acc.likes < e.likes ? e : acc, { likes: -1 })
 }
 
 const mostBlogs = (blogs) => {
-  if (blogs.length == 0)
+  if (!blogs || blogs.length == 0)
     return undefined
 
   const hmap = _.groupBy(blogs, 'author')
@@ -25,7 +25,7 @@ const mostBlogs = (blogs) => {
 }
 
 const mostLikes = (blogs) => {
-  if (blogs.length == 0)
+  if (!blogs || blogs.length == 0)
     return undefined
 
   const hmap = _.groupBy(blogs, 'author')

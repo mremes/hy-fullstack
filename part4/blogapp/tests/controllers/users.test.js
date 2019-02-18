@@ -1,9 +1,9 @@
 const supertest = require('supertest')
 const mongoose = require('mongoose')
 
-const app = require('../app')
-const wrapper = require('../utils/wrapper')
-const User = require('../models/user')
+const app = require('../../app')
+const wrapper = require('../wrapper')
+const User = require('../../models/user')
 
 const api = wrapper(supertest(app), '/api/users')
 
