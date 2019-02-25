@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
 const Blog = ({ blog, isOwner, likeHandler, deleteHandler }) => {
   const [visible, setVisible] = useState(false)
@@ -23,11 +24,11 @@ const Blog = ({ blog, isOwner, likeHandler, deleteHandler }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='reducedContent'>
       <div style={defaultStyle}>
         <b onClick={toggleVisibility} style={{ ...titleStyle, display: 'inline' }}>{blog.title}</b> {blog.author}
       </div>
-      <div style={expandedStyle}>
+      <div style={expandedStyle} className='fullContent'>
         <b onClick={toggleVisibility} style={titleStyle}>{blog.title}</b><br />
         <i>{blog.author}</i><br />
         <a href={blog.url} target='_blank' rel='noopener noreferrer'>{blog.url}</a><br />
@@ -36,6 +37,13 @@ const Blog = ({ blog, isOwner, likeHandler, deleteHandler }) => {
       </div>
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  isOwner: PropTypes.bool.isRequired,
+  likeHandler: PropTypes.func.isRequired,
+  deleteHandler: PropTypes.func.isRequired
 }
 
 export default Blog

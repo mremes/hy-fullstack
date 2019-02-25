@@ -124,11 +124,23 @@ const App = () => {
     )
   }
 
-  const showLoginInfo = () => {
+  const mainContent = () => {
     return (
       <div>
         <p>Logged in as {user.name}</p>
         <button onClick={handleLogout}>logout</button>
+        <h2>create new</h2>
+        <div>
+          <form onSubmit={handleNewBlog}>
+            <div>title: <input type='text' name='newBlogTitle' value={newBlogTitle} onChange={({ target }) => setNewBlogTitle(target.value)} /></div>
+            <div>author: <input type='text' name='newBlogAuthor' value={newBlogAuthor} onChange={({ target }) => setNewBlogAuthor(target.value)} /></div>
+            <div>url: <input type='text' name='newBlogUrl' value={newBlogUrl} onChange={({ target }) => setNewBlogUrl(target.value)} /></div>
+            <button type='submit'>create</button>
+          </form>
+        </div>
+        <h2>blogs</h2>
+        <div></div>
+        {blogs.map(blog => <Blog key={blog.id} blog={blog} isOwner={blog.user.username == (user || {}).username} likeHandler={handleLike} deleteHandler={handleDelete} />)}
       </div>
     )
   }
@@ -137,18 +149,7 @@ const App = () => {
     <div>
       <Notification message={errorMessage} handler={setErrorMessage} className='error' />
       <Notification message={successMessage} handler={setSuccessMessage} className='success' />
-      {user ? showLoginInfo() : loginForm()}
-      <h2>create new</h2>
-      <div>
-        <form onSubmit={handleNewBlog}>
-          <div>title: <input type='text' name='newBlogTitle' value={newBlogTitle} onChange={({ target }) => setNewBlogTitle(target.value)} /></div>
-          <div>author: <input type='text' name='newBlogAuthor' value={newBlogAuthor} onChange={({ target }) => setNewBlogAuthor(target.value)} /></div>
-          <div>url: <input type='text' name='newBlogUrl' value={newBlogUrl} onChange={({ target }) => setNewBlogUrl(target.value)} /></div>
-          <button type='submit'>create</button>
-        </form>
-      </div>
-      <h2>blogs</h2>
-      {blogs.map(blog => <Blog key={blog.id} blog={blog} isOwner={blog.user.username == (user || {}).username} likeHandler={handleLike} deleteHandler={handleDelete} />)}
+      {user ? mainContent() : loginForm()}
     </div>
   )
 }
