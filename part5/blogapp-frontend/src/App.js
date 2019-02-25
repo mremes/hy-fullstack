@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { useField } from './hooks'
+import { useField, useResource } from './hooks'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
-import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  const [blogs, blogService] = useResource('/api/blogs')
   const username = useField('text')
   const password = useField('password')
   const [errorMessage, setErrorMessage] = useState('')
@@ -20,8 +19,7 @@ const App = () => {
   const url = useField('text')
 
   const updateBlogList = async () => {
-    const blogs = await blogService.getAll()
-    setBlogs(blogs.sort((a, b) => b.likes - a.likes))
+    blogService.fetch()
   }
 
   useEffect(() => {
@@ -74,8 +72,8 @@ const App = () => {
         likes: blog.likes + 1
       }
 
-      const response = await blogService.updateBlog(newBlog, blog.id)
-      setBlogs(blogs.map(e => e.id !== blog.id ? e : response).sort((a, b) => b.likes - a.likes))
+      const response = await blogService.update(newBlog, blog.id)
+      blogService.set(blogs.map(e => e.id !== blog.id ? e : response).sort((a, b) => b.likes - a.likes))
     } catch (error) {
       setErrorMessage('error while liking')
     }
@@ -90,9 +88,9 @@ const App = () => {
     if (!confirm) return
 
     try {
-      const deleted = await blogService.deleteBlog(event.target.id)
+      const deleted = await blogService.delete(event.target.id)
       if (deleted) {
-        setBlogs(blogs.filter(e => e.id !== event.target.id))
+        blogService.set(blogs.filter(e => e.id !== event.target.id))
       } else {
         setErrorMessage('error while deleting')
       }
@@ -104,9 +102,9 @@ const App = () => {
   const handleNewBlog = async (event) => {
     event.preventDefault()
     try {
-      let newBlog = await blogService.createBlog({ title: title.value, author: author.value, url: url.value })
+      let newBlog = await blogService.create({ title: title.value, author: author.value, url: url.value })
       newBlog = { ...newBlog, user: { username: user.username } }
-      setBlogs(blogs.concat(newBlog))
+      blogService.set(blogs.concat(newBlog))
       setSuccessMessage('blog entry successfully created')
       title.reset()
       author.reset()
