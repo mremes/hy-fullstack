@@ -69,15 +69,15 @@ blogsRouter.delete('/:id', async (request, response, next) => {
   }
 })
 
-blogsRouter.put('/', async (request, response, next) => {
+blogsRouter.put('/:id', async (request, response, next) => {
   let doc = request.body
 
   try {
-    let blog = await Blog.findById(doc.id)
+    let blog = await Blog.findById(request.params.id)
     blog.likes = doc.likes
     blog.url = doc.url
     await blog.save()
-    response.status(200).end()
+    response.status(200).json(blog.toJSON())
   } catch (error) {
     next(error)
   }
