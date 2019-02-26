@@ -40,8 +40,6 @@ export const useResource = (url) => {
   }
 
   const create = async (entry) => {
-    console.log(entry)
-    console.log(token)
     const response = await axios.post(url, entry, authHeader())
     return response.data
   }
