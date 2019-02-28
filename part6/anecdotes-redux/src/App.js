@@ -1,18 +1,14 @@
-import React from 'react';
-import Notification from './components/Notification'
-import AnecdoteForm from './components/AnecdoteForm'
-import AnecdoteList from './components/AnecdoteList'
-import AnecdoteFilter from './components/AnecdoteFilter'
+import React from 'react'
+import { Notification, AnecdoteForm, AnecdoteList } from './components'
 
-const App = ({ store }) => {
+const App = () => {
   return (
     <div>
-      <Notification store={store} />
+      <Notification />
       <h2>create new</h2>
-      <AnecdoteForm store={store} />
+      <AnecdoteForm />
       <h2>anecdotes</h2>
-      filter <AnecdoteFilter store={store} />
-      <AnecdoteList store={store} />
+      <AnecdoteList />
     </div>
   )
 }

@@ -1,3 +1,6 @@
+const VOTE = 'VOTE'
+const NEW = 'NEW'
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -18,23 +21,23 @@ const asObject = (anecdote) => {
 }
 
 export const vote = (id) => {
-  return { type: 'VOTE', data: { id } }
+  return { type: VOTE, data: { id } }
 }
 
 export const newAnecdote = (anecdote) => {
-  return { type: 'NEW', data: asObject(anecdote) }
+  return { type: NEW, data: asObject(anecdote) }
 }
 
 const initialState = anecdotesAtStart.map(asObject)
 
 const anecdoteReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'VOTE':
+    case VOTE:
       const id = action.data.id
       const obj = state.find(a => a.id === id)
       const newObj = { ...obj, votes: obj.votes + 1 }
       return state.map(a => a.id === id ? newObj : a)
-    case 'NEW':
+    case NEW:
       return [...state, action.data]
     default:
       return state
