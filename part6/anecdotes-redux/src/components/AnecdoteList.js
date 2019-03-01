@@ -4,7 +4,7 @@ import { AnecdoteFilter, Anecdote } from './'
 
 const AnecdoteList = (props) => (
     <div>
-        filter <AnecdoteFilter />
+        <AnecdoteFilter />
         {props.anecdotes.map(anecdote =>
             <Anecdote key={anecdote.id} anecdote={anecdote} />
         )}

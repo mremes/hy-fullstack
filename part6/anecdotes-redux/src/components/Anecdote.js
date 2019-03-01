@@ -1,15 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { vote } from '../reducers/anecdoteReducer'
-import { setNotification, resetNotification } from '../reducers/notificationReducer'
-import { setGlobalTimeout } from '../utils'
+import { setNotification } from '../reducers/notificationReducer'
 
 const Anecdote = (props) => {
   const anecdote = props.anecdote
+
   const voteHandler = (id) => {
     props.vote(id)
     props.setNotification(`voted for "${anecdote.content}"`)
-    setGlobalTimeout(() => props.resetNotification())
   }
 
   return (
@@ -22,10 +21,10 @@ const Anecdote = (props) => {
     </div>
   )
 }
+
 const mapDispatchToProps = {
   vote,
-  setNotification,
-  resetNotification
+  setNotification
 }
 
 const ConnectedAnecdote = connect(

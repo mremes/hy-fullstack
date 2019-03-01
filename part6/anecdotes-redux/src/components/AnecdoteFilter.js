@@ -4,7 +4,7 @@ import { setFilter } from '../reducers/filterReducer'
 
 const AnecdoteFilter = (props) => (
     <div style={{ marginBottom: 10 }}>
-        <input onChange={(event) => props.setFilter(event.target.value)} />
+        filter <input onChange={(event) => props.setFilter(event.target.value)} />
     </div>
 )
 
