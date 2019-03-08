@@ -1,8 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Form, Button } from 'react-bootstrap'
 import { useField } from '../hooks'
-import Togglable from './Togglable'
-import { login, logout } from '../reducers/userReducer'
+import { login, logout } from '../reducers/loginReducer'
+
 
 const LoginForm = (props) => {
   const username = useField('text')
@@ -18,39 +19,30 @@ const LoginForm = (props) => {
 
   return (
     <div>
-      <Togglable buttonLabel='log in'>
-        <div>
-          <h2>log in to application</h2>
-          <form onSubmit={handleLogin}>
-            <div>
-              username
-              <input
-                type={username.type}
-                value={username.value}
-                name='Username'
-                onChange={username.onChange}
-              />
-            </div>
-            <div>
-              password
-              <input
-                type={password.type}
-                value={password.value}
-                name='Password'
-                onChange={password.onChange}
-              />
-            </div>
-            <button type='submit'>login</button>
-          </form>
-        </div>
-      </Togglable>
+      <Form inline onSubmit={handleLogin}>
+        <Form.Control
+          type={username.type}
+          value={username.value}
+          name='Username'
+          placeholder='username'
+          onChange={username.onChange}
+        />
+        <Form.Control
+          type={password.type}
+          value={password.value}
+          name='Password'
+          placeholder='password'
+          onChange={password.onChange}
+        />
+        <Button type='submit'>log in</Button>
+      </Form>
     </div>
   )
 }
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user
+    user: state.login
   }
 }
 

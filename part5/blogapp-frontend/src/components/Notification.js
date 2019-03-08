@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Alert } from 'react-bootstrap'
 
 const Notification = (props) => {
   const notification = props.notification
@@ -8,9 +9,9 @@ const Notification = (props) => {
   }
 
   return (
-    <div className={notification.type}>
+    <Alert variant={notification.type === 'error' ? 'danger' : notification.type }>
       {notification.message}
-    </div>
+    </Alert>
   )
 }
 

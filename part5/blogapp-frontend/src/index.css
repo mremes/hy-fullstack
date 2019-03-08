@@ -18,3 +18,8 @@
     margin-top: 10px;
     margin-bottom: 10px;
   }
+.menu {
+  margin: 0 auto;
+  padding: 10px 0;
+  background-color: #DCDCDC;
+}

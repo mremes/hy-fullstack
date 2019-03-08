@@ -1,9 +1,12 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { logout } from '../reducers/userReducer'
-
+import { logout } from '../reducers/loginReducer'
+import { Button } from 'react-bootstrap'
 const LoggedInHeader = (props) => {
+  const user = props.user
+  if (!user) return null
+
   const handleLogout = async (event) => {
     event.preventDefault()
     window.localStorage.removeItem('user')
@@ -11,16 +14,15 @@ const LoggedInHeader = (props) => {
   }
 
   return (
-    <div>
-      <p>Logged in as {props.user.name}</p>
-      <button onClick={handleLogout}>logout</button>
+    <div style={{ float: 'right', paddingRight: 10 }}>
+      Logged in as {user.name} <Button onClick={handleLogout}>logout</Button>
     </div>
   )
 }
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user
+    user: state.login
   }
 }
 

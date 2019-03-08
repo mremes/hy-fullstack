@@ -1,49 +1,80 @@
-import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
+import { connect } from 'react-redux'
+import { ListGroup, Form, Button, FormGroup } from 'react-bootstrap'
+import { useField } from '../hooks'
+import { deleteBlog, likeBlog, addComment } from '../reducers/blogReducer'
 
-const Blog = ({ blog, isOwner, likeHandler, deleteHandler }) => {
-  const [visible, setVisible] = useState(false)
+const Blog = (props) => {
+  const comment = useField('text')
 
-  const defaultStyle = { display: visible ? 'none' : '' }
-  const expandedStyle = { display: visible ? '' : 'none' }
+  const blog = props.blogs.find(b => b.id === props.blogId)
+  const user = props.user
 
-  const toggleVisibility = () => {
-    setVisible(!visible)
+  if (!blog || !user) return null
+  const isOwner = blog.user.username === (user || {}).username
+
+  const likeHandler = async (event) => {
+    event.preventDefault()
+    props.likeBlog(event.target.id)
   }
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
+  const deleteHandler = async (event) => {
+    event.preventDefault()
+    event.persist()
+    const id = event.target.id
+    if (!window.confirm(`Are you sure to delete blog id ${id}?`)) return
+    props.deleteBlog(id)
   }
 
-  const titleStyle = {
-    cursor: 'pointer'
+  const handleComment = async (event) => {
+    event.preventDefault()
+    console.log(event.target.id)
+    if (comment.value.length === 0) return
+    props.addComment(event.target.id, comment.value)
+    comment.reset()
   }
 
   return (
-    <div style={blogStyle} className='reducedContent'>
-      <div style={defaultStyle}>
-        <b onClick={toggleVisibility} style={{ ...titleStyle, display: 'inline' }}>{blog.title}</b> {blog.author}
-      </div>
-      <div style={expandedStyle} className='fullContent'>
-        <b onClick={toggleVisibility} style={titleStyle}>{blog.title}</b><br />
-        <i>{blog.author}</i><br />
+    <div>
+      <div>
+        <h2>{blog.title} – {blog.author}</h2>
         <a href={blog.url} target='_blank' rel='noopener noreferrer'>{blog.url}</a><br />
-        {blog.likes} likes <button id={blog.id} onClick={likeHandler}>like</button><br />
-        <button style={{ display: isOwner ? '' : 'none' }} id={blog.id} onClick={deleteHandler}>delete</button>
+        {blog.likes} likes <Button id={blog.id} onClick={likeHandler}>like</Button><br />
+        {isOwner ? <div><Button id={blog.id} onClick={deleteHandler}>delete</Button> <br /></div> : null}
+        added by {blog.user.name}
+        <h3>comments</h3>
+        <Form inline onSubmit={handleComment} id={blog.id}>
+          <FormGroup>
+            <Form.Control type={comment.type} name='comment' value={comment.value} onChange={comment.onChange} />
+          </FormGroup>
+          <Button type='submit'>add comment</Button>
+        </Form>
+        {blog.comments.length > 0 ?
+          <ListGroup>
+            {blog.comments.map(c => (
+              <ListGroup.Item key={c}>{c}</ListGroup.Item>
+            ))}
+          </ListGroup>
+          : <p>this blog has no comments</p>}
+
       </div>
     </div>
   )
 }
 
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  isOwner: PropTypes.bool.isRequired,
-  likeHandler: PropTypes.func.isRequired,
-  deleteHandler: PropTypes.func.isRequired
+const mapStateToProps = (state) => {
+  return {
+    blogs: state.blogs,
+    user: state.login
+  }
 }
 
-export default Blog
+const mapDispatchToProps = {
+  deleteBlog,
+  likeBlog,
+  addComment
+}
+
+const ConnectedBlog = connect(mapStateToProps, mapDispatchToProps)(Blog)
+
+export default ConnectedBlog

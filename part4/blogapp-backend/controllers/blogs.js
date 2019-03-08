@@ -33,7 +33,25 @@ blogsRouter.post('/', async (request, response, next) => {
     user.blogs = user.blogs.concat(blog.id)
     await user.save()
 
-    response.status(201).json(blog.toJSON())
+    return response.status(201).json(blog.toJSON())
+  } catch (error) {
+    next(error)
+  }
+})
+
+blogsRouter.post('/:id/comments', async (request, response, next) => {
+  try {
+    const id = request.params.id
+    const blog = await Blog.findById(id)
+
+    if (!blog) {
+      return response.status(401).json({ error: `blog with id ${id} not found` })
+    }
+
+    blog.comments = (blog.comments || []).concat(request.body.content)
+    await blog.save()
+
+    return response.status(200).json(blog.toJSON())
   } catch (error) {
     next(error)
   }
@@ -76,6 +94,7 @@ blogsRouter.put('/:id', async (request, response, next) => {
     let blog = await Blog.findById(request.params.id)
     blog.likes = doc.likes
     blog.url = doc.url
+    blog.comments = doc.comments
     await blog.save()
     response.status(200).json(blog.toJSON())
   } catch (error) {

@@ -1,34 +1,23 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Blog from './Blog'
-import { deleteBlog, likeBlog } from '../reducers/blogReducer'
+import { Link } from 'react-router-dom'
+import { ListGroup } from 'react-bootstrap'
 
 const BlogList = (props) => {
-  const blogs = props.blogs
-  const user = props.user
-
-  const handleLike = async (event) => {
-    event.preventDefault()
-    props.likeBlog(event.target.id)
-  }
-
-  const handleDelete = async (event) => {
-    event.preventDefault()
-    event.persist()
-    const id = event.target.id
-
-    const confirm = window.confirm(`Are you sure to delete blog id ${id}?`)
-    if (!confirm) return
-
-    props.deleteBlog(id)
-  }
+  const blogs = props.blogList || props.blogs
+  if (!blogs) return null
 
   return (
     <div>
       <h2>blogs</h2>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} isOwner={blog.user.username === (user || {}).username} likeHandler={handleLike} deleteHandler={handleDelete} />
-      )}
+      <ListGroup>
+        {blogs.length > 0 ? blogs.map(blog => (
+          <ListGroup.Item action key={blog.id}>
+            <Link style={{ textDecoration: 'none' }} to={`/blogs/${blog.id}`}>{blog.title}</Link>
+          </ListGroup.Item>
+        )
+        ) : <p>There are no blogs.</p>}
+      </ListGroup>
     </div>
   )
 }
@@ -36,15 +25,10 @@ const BlogList = (props) => {
 const mapStateToProps = (state) => {
   return {
     blogs: state.blogs,
-    user: state.user
+    user: state.login
   }
 }
 
-const mapDispatchToProps = {
-  deleteBlog,
-  likeBlog
-}
-
-const ConnectedBlogList = connect(mapStateToProps, mapDispatchToProps)(BlogList)
+const ConnectedBlogList = connect(mapStateToProps)(BlogList)
 
 export default ConnectedBlogList

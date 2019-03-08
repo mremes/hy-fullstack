@@ -1,45 +1,18 @@
-import loginService from '../services/login'
-import blogService from '../services/blogs'
-import { setErrorNotification } from './notificationReducer'
+import userService  from '../services/users'
 
-const LOGIN = 'LOGIN'
-const LOGOUT = 'LOGOUT'
-const SET = 'SET'
+const INIT = 'INIT_USERS'
 
-export const login = (username, password) => {
+export const initializeUsers = () => {
   return async dispatch => {
-    try {
-      let response = await loginService.login({ username, password })
-      const user = response.data
-      window.localStorage.setItem('user', JSON.stringify(user))
-      blogService.setToken(user.token)
-      dispatch({ type: LOGIN, data: user })
-    } catch (error) {
-      setErrorNotification(dispatch, 'invalid username or password')
-    }
+    const request = await userService.getAll()
+    const users = request.data
+    dispatch({ type: INIT, data: users })
   }
 }
 
-export const logout = () => {
-  return async dispatch => {
-    blogService.setToken(null)
-    dispatch({ type: LOGOUT })
-  }
-}
-
-export const setUser = (user) => {
-  return async dispatch => {
-    dispatch({ type: SET, data: user })
-  }
-}
-
-const userReducer = (state = null, action) => {
+const userReducer = (state = [], action) => {
   switch (action.type) {
-    case LOGIN:
-      return action.data
-    case LOGOUT:
-      return null
-    case SET:
+    case INIT:
       return action.data
     default:
       return state
