@@ -1,6 +1,7 @@
-const { ApolloServer, gql } = require('apollo-server')
+const { ApolloServer, gql, UserInputError } = require('apollo-server')
+const uuid = require('uuid/v1')
 
-const authors = [
+let authors = [
   {
     name: 'Robert Martin',
     id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
@@ -16,11 +17,11 @@ const authors = [
     id: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
     born: 1821
   },
-  { 
+  {
     name: 'Joshua Kerievsky', // birthyear not known
     id: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
   },
-  { 
+  {
     name: 'Sandi Metz', // birthyear not known
     id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
   },
@@ -31,7 +32,7 @@ const authors = [
  * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
 */
 
-const books = [
+let books = [
   {
     title: 'Clean Code',
     published: 2008,
@@ -59,7 +60,7 @@ const books = [
     author: 'Joshua Kerievsky',
     id: "afa5de01-344d-11e9-a414-719c6709cf3e",
     genres: ['refactoring', 'patterns']
-  },  
+  },
   {
     title: 'Practical Object-Oriented Design, An Agile Primer Using Ruby',
     published: 2012,
@@ -84,12 +85,80 @@ const books = [
 ]
 
 const typeDefs = gql`
+  type Author {
+    name: String!
+    born: Int
+    bookCount: Int
+  }
+
+  type Book {
+    title: String!
+    published: Int!
+    author: String!
+    genres: [String!]!
+  }
+
   type Query {
+    bookCount: Int!
+    authorCount: Int!
+    allBooks(author: String, genre: String): [Book!]!
+    allAuthors: [Author!]!
+  }
+
+  type Mutation {
+    addBook(
+      title: String!
+      published: Int!
+      author: String!
+      genres: [String!]!
+    ): Book
+    editAuthor(
+      name: String!
+      setBornTo: Int!
+    ): Author
   }
 `
 
 const resolvers = {
+  Author: {
+    bookCount: (root) => books.filter(b => b.author == root.name).length
+  },
+
   Query: {
+    bookCount: () => books.length,
+    authorCount: () => authors.length,
+    allBooks: (_, args) => {
+      const isAuthor = (book, author) => book.author == (author || book.author)
+      const hasGenre = (book, genre) => genre ? book.genres.includes(genre) : book.genres
+
+      return books.filter(b => isAuthor(b, args.author) && hasGenre(b, args.genre))
+    },
+    allAuthors: () => authors
+  },
+
+  Mutation: {
+    addBook: (_, args) => {
+      if (books.find(b => b.title == args.title)) {
+        throw new UserInputError("Book already exists", { title: args.title })
+      }
+
+      if (!authors.find(a => a.name == args.author)) {
+        authors = authors.concat({ name: args.author, id: uuid() })
+      }
+
+      const book = { ...args, id: uuid() }
+      books = books.concat(book)
+      return book
+    },
+    editAuthor: (_, args) => {
+      let found = authors.find(a => a.name == args.name)
+      if (!found) {
+        return null
+      }
+      found = { ...found, born: args.setBornTo }
+      authors = authors.map(a => a.name == args.name ? found : a)
+      return found
+    }
   }
 }
 
