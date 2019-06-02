@@ -1,11 +1,43 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { gql } from 'apollo-boost'
 
-const Books = ({show, result}) => {
-  if (!show || result.loading) {
+const BOOKS_BY_GENRE = gql`
+query getAllBooks($genre: String) {
+  allBooks(genre: $genre) {
+    title
+    published
+    author {
+      name
+    }
+    genres
+  }
+}
+`
+
+const Books = ({ client, show, result, books, recommended }) => {
+  if (((!show || (result && result.loading)) && !recommended)) {
     return null
   }
-  console.log(result)
-  const books = result.data.allBooks
+  books = books || result.data.allBooks
+
+  let genres = []
+  if (result) {
+    genres = Array.from(new Set([].concat.apply([], (books.map(b => b.genres || [])))))
+  }
+
+  const [filteredBooks, setFilteredBooks] = useState(books)
+
+  const filterBooks = async (genre) => {
+    if (genre) {
+      const { data } = await client.query({
+        query: BOOKS_BY_GENRE,
+        variables: { genre: genre }
+      })
+      setFilteredBooks(data.allBooks)
+    } else {
+      setFilteredBooks(books)
+    }
+  }
 
   return (
     <div>
@@ -22,15 +54,18 @@ const Books = ({show, result}) => {
               published
             </th>
           </tr>
-          {books.map(a =>
+          {filteredBooks.map(a =>
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
               <td>{a.published}</td>
-            </tr>
-          )}
+            </tr>)}
         </tbody>
       </table>
+      <div>
+        {!recommended ? <button onClick={() => filterBooks(null)}>all</button> : null}
+        {!recommended ? genres.map(g => <button key={g} onClick={() => filterBooks(g)}>{g}</button>) : null}
+      </div>
     </div>
   )
 }

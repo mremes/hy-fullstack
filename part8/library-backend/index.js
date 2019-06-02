@@ -81,9 +81,9 @@ const resolvers = {
   },
 
   Query: {
-    bookCount: () => Book.collection.countDocuments(),
-    authorCount: () => Author.collection.countDocuments(),
-    allBooks: (_, args) => {
+    bookCount: async () => await Book.collection.countDocuments(),
+    authorCount: async () => await Author.collection.countDocuments(),
+    allBooks: async (_, args) => {
       const genre = args.genre
       const author = args.author
       const query_args = {}
@@ -91,7 +91,7 @@ const resolvers = {
       if (genre) query_args.genres = { $in: [genre] }
       if (author) query_args.author = { $eq: author }
 
-      return Book.find(query_args).populate('author')
+      return await Book.find(query_args).populate('author')
     },
     allAuthors: () => Author.find({}),
     me: (_0, _1, context) => {
@@ -102,9 +102,8 @@ const resolvers = {
   Mutation: {
     addBook: async (_, args, ctx) => {
       if (!ctx.currentUser) throw new AuthenticationError("must be logged in.")
-      let existing = Book.find({ title: args.title }).countDocuments()
+      let existing = await Book.find({ title: args.title }).count()
       if (existing != 0) throw new UserInputError("Book already exists", { title: args.title })
-
 
       let author = await Author.findOne({ name: args.author })
       if (!author) {
@@ -166,6 +165,16 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: async ({ req }) => {
+    const auth = req ? req.headers.authorization : null
+    if (auth && auth.toLowerCase().startsWith('bearer ')) {
+      const decodedToken = jwt.verify(
+        auth.substring(7), process.env.JWT_SECRET
+      )
+      const currentUser = await User.findById(decodedToken.id)
+      return { currentUser }
+    }
+  }
 })
 
 server.listen().then(({ url }) => {

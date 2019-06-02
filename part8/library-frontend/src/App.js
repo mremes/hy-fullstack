@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { gql } from 'apollo-boost'
-import { useQuery, useMutation } from 'react-apollo-hooks'
+import { useQuery, useMutation, useApolloClient } from 'react-apollo-hooks'
+
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import Login from './components/Login'
+import Recommend from './components/Recommend'
 
 const ALL_AUTHORS = gql`
 {
@@ -25,6 +27,7 @@ const ALL_BOOKS = gql`
       born
     }
     published
+    genres
   }
 }
 `
@@ -50,33 +53,44 @@ const LOGIN = gql`
   }
 `
 
+const FAVORITE_GENRE = gql`{ me { favoriteGenre } }`
+
 const App = () => {
   const [page, setPage] = useState('authors')
   const [token, setToken] = useState('')
+
+  const client = useApolloClient();
   const authors = useQuery(ALL_AUTHORS)
   const books = useQuery(ALL_BOOKS)
-  const addBook = useMutation(CREATE_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }]
-  })
-  const setBirthyear = useMutation(SET_BIRTHYEAR, {
-    refetchQueries: [{ query: ALL_AUTHORS }]
-  })
+  const favoriteGenre = useQuery(FAVORITE_GENRE)
+  const addBook = useMutation(CREATE_BOOK, { refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }] })
+  const setBirthyear = useMutation(SET_BIRTHYEAR, { refetchQueries: [{ query: ALL_AUTHORS }] })
   const login = useMutation(LOGIN)
+
+  const navs = [
+    { name: 'authors', label: 'authors', whenLogged: false },
+    { name: 'books', label: 'books', whenLogged: false },
+    { name: 'add', label: 'add book', whenLogged: true },
+    { name: 'recommend', label: 'recommended', whenLogged: false }
+  ]
 
   return (
     <div>
       <div>
-        <Login login={login} token={token} setToken={setToken} />
+        <Login client={client} login={login} token={token} setToken={setToken} />
       </div>
       <div>
-        <button onClick={() => setPage('authors')}>authors</button>
-        <button onClick={() => setPage('books')}>books</button>
-        <button onClick={() => setPage('add')}>add book</button>
+        {navs.map(n => {
+          if ((token && n.whenLogged) || !n.whenLogged) {
+            return (<button key={n.name} onClick={() => setPage(n.name)}>{n.label}</button>)
+          }
+          return null
+        })}
       </div>
       <Authors show={page === 'authors'} result={authors} setBirthyear={setBirthyear} />
-      <Books show={page === 'books'} result={books} />
+      <Books client={client} show={page === 'books'} result={books} />
       <NewBook show={page === 'add'} addBook={addBook} />
-
+      <Recommend show={page === 'recommend'} resultBooks={books} resultGenre={favoriteGenre} />
     </div>
   )
 }
