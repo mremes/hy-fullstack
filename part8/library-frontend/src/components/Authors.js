@@ -1,15 +1,20 @@
 import React, { useState } from 'react'
 
-const Authors = ({show, result}) => {
-  if (!show) {
+const Authors = ({show, result, setBirthyear}) => {
+  const [name, setName] = useState('')
+  const [year, setYear] = useState('')
+
+  if (!show || result.loading) {
     return null
   }
 
-  if (result.loading) {
-    return null
-  }
+  const authors = result.data.allAuthors || []
 
-  const authors = result.data.allAuthors
+  const submit = async (e) => {
+    e.preventDefault()
+    setBirthyear({ variables: { name, year: parseInt(year) }})
+    setYear('')
+  }
 
   return (
     <div>
@@ -34,7 +39,17 @@ const Authors = ({show, result}) => {
           )}
         </tbody>
       </table>
-
+      <h2>set birthyear</h2>
+      <form onSubmit={submit}>
+        <div> name 
+        <select value={name} onChange={({ target }) => setName(target.value)}>
+          {authors.map(a =>
+            <option value={a.name} key={a.name}>{a.name}</option>
+            )}
+        </select></div>
+        <div> year <input value={year} onChange={({ target }) => setYear(target.value)} /></div>
+        <button type='submit'>set </button>
+      </form>
     </div>
   )
 }
